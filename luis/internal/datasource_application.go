@@ -1,25 +1,12 @@
-package template
+package luis
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
-	"fmt"
-	"os"
-	"path/filepath"
-	"strings"
-
-	"github.com/hashicorp/hcl2/hcl"
-	"github.com/hashicorp/hcl2/hcl/hclsyntax"
-	"github.com/hashicorp/terraform/helper/pathorcontents"
-	"github.com/hashicorp/terraform/helper/schema"
-	tflang "github.com/hashicorp/terraform/lang"
-	"github.com/zclconf/go-cty/cty"
-	ctyconvert "github.com/zclconf/go-cty/cty/convert"
+	"github.com/crazedpeanut/terraform-provider-luis/luis/internal/clients"
 )
 
-func dataSourceFile() *schema.Resource {
+func dataSourceApplication() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceFileRead,
+		Read: dataSourceApplicationRead,
 
 		Schema: map[string]*schema.Schema{
 			"template": {
@@ -65,13 +52,13 @@ func dataSourceFile() *schema.Resource {
 	}
 }
 
-func dataSourceFileRead(d *schema.ResourceData, meta interface{}) error {
-	rendered, err := renderFile(d)
-	if err != nil {
-		return err
-	}
-	d.Set("rendered", rendered)
-	d.SetId(hash(rendered))
+func dataSourceApplicationRead(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*Client)
+
+	id := d.getId()
+
+	client.GetApplication(id)
+	d.SetId()
 	return nil
 }
 

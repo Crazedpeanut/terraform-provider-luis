@@ -1,4 +1,4 @@
-package template
+package luis
 
 import (
 	"fmt"
