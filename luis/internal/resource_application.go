@@ -15,6 +15,7 @@ func ResourceApplication() *schema.Resource {
 		Create: resourceApplicationCreate,
 		Read:   resourceApplicationRead,
 		Delete: resourceApplicationDelete,
+		Update: resourceApplicationUpdate,
 
 		Schema: map[string]*schema.Schema{
 			"id": {
@@ -99,6 +100,30 @@ func resourceApplicationCreate(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
+func resourceApplicationUpdate(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*luis.LuisAuthoring)
+
+	application := models.ApplicationUpdateObject{
+		Name:             d.Get("name").(string),
+		Description:      d.Get("desciption").(string),
+		UsageScenario:    d.Get("usage_scenario").(string),
+		Domain:           d.Get("domain").(string),
+	}
+
+	params := operations.UpdateApplicationParams{
+		ApplicationUpdateObject: &application,
+		AppID: d.Id()
+	}
+
+	resp, err := client.Operations.UpdateApplication(&params, nil)
+	if err != nil {
+		fmt.Errorf("Could not update application %s", err)
+		return nil
+	}
+
+	return nil
+}
+
 func resourceApplicationDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*luis.LuisAuthoring)
 
@@ -112,7 +137,6 @@ func resourceApplicationDelete(d *schema.ResourceData, meta interface{}) error {
 	_, err := client.Operations.DeleteApplication(&params, nil)
 	if err != nil {
 		fmt.Errorf("Could not delete application %s", err)
-		return nil
 	}
 
 	return nil
