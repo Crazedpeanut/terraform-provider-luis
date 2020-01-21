@@ -1,78 +1,23 @@
-package luis
+package clients
 
 import (
-	"io/ioutil"
-	"net/http"
+	"github.com/go-openapi/strfmt"
+
+	luis "github.com/crazedpeanut/luis/client"
+	"github.com/go-openapi/runtime/client"
 )
 
-type Application struct {
-	name string
-}
-
-type CreateApplicationModel struct {
-	name string
-}
-
-type UpdateApplicationModel struct {
-	name string
-}
-
-type GetApplications func() []Application
-type GetApplication func(string) Application
-type DeleteApplication func(string)
-type CreateApplication func(CreateApplicationModel) string
-type UpdateApplication func(string, UpdateApplicationModel)
-
-type Client struct {
-	getApps   GetApplications
-	getApp    GetApplication
-	deleteApp DeleteApplication
-	createApp CreateApplication
-	updateApp UpdateApplication
-}
-
+// ClientOptions is used to configure luis clients
 type ClientOptions struct {
-	authoringKey string
-	domain       string
+	AuthoringKey string
+	Domain       string
 }
 
-func createApplication(o *ClientOptions) string {
-	return func(app *CreateApplication) {
+// NewClient produces a client to call LUIS Authoring API
+func NewClient(o *ClientOptions) *luis.LuisAuthoring {
 
-	}
-}
+	transport := client.New(o.Domain, "", nil)
+	transport.DefaultAuthentication = client.APIKeyAuth("Ocp-Apim-Subscription-Key", "header", o.AuthoringKey)
 
-func createApplication(o *ClientOptions) string {
-	return func(id string, app *UpdateApplication) {
-
-	}
-}
-
-func getApplications(o *ClientOptions) string {
-	return func() []Application {
-
-	}
-}
-
-func getApplication(o *ClientOptions) string {
-	return func(id string) []Application {
-
-	}
-}
-
-func getApplication(o *ClientOptions) string {
-	return func(id string) {
-
-	}
-}
-
-func NewClient(o *ClientOptions) *Client {
-
-	return &Client{
-		createApp: createApplication(o),
-		getApps: getApplications(o),
-		getApp: getApplication(o)
-		updateApp: updateApplication(o),
-		deleteApp: deleteApplication(o)
-	}
+	return luis.New(transport, strfmt.Default)
 }

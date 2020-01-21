@@ -2,9 +2,12 @@ package luis
 
 import (
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/crazedpeanut/terraform-provider-luis/luis/internal"
+	"github.com/crazedpeanut/terraform-provider-luis/luis/internal/clients"
 	"github.com/hashicorp/terraform/terraform"
 )
 
+// Provider of luis resources
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		ConfigureFunc: configureFunc,
@@ -20,27 +23,18 @@ func Provider() terraform.ResourceProvider {
 				Default:  "westus.api.cognitive.microsoft.com",
 			},
 		},
-		DataSourcesMap: map[string]*schema.Resource{
-			"luis_application": dataSourceApplication(),
-			"luis_version":     dataSourceVersion(),
-		},
 		ResourcesMap: map[string]*schema.Resource{
-			"template_file": schema.DataSourceResourceShim(
-				"template_file",
-				dataSourceFile(),
-			),
-			"template_cloudinit_config": schema.DataSourceResourceShim(
-				"template_cloudinit_config",
-				dataSourceCloudinitConfig(),
-			),
-			"template_dir": resourceDir(),
+			"luis_application": internal.ResourceApplication(),
+			"luis_version": internal.ResourceVersion(),
 		},
 	}
 }
 
 func configureFunc(d *schema.ResourceData) (interface{}, error) {
-	authoringKey := d.Get("authoring_key").(string)
-	domain := d.Get("domain").(string)
+	options := clients.ClientOptions{
+		AuthoringKey: d.Get("authoring_key").(string),
+		Domain:       d.Get("domain").(string),
+	}
 
-	return client, nil
+	return clients.NewClient(&options), nil
 }

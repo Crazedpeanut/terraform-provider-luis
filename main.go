@@ -1,11 +1,11 @@
-package main
+package luis
 
 import (
-	"github.com/crazedpeanut/terraform-provider-luis/template"
+	"github.com/crazedpeanut/terraform-provider-luis/luis"
 	"github.com/hashicorp/terraform/plugin"
 )
 
 func main() {
 	plugin.Serve(&plugin.ServeOpts{
-		ProviderFunc: template.Provider})
+		ProviderFunc: luis.Provider})
 }
