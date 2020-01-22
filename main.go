@@ -1,4 +1,4 @@
-package luis
+package main
 
 import (
 	"github.com/crazedpeanut/terraform-provider-luis/luis"

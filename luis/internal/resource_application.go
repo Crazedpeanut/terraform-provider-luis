@@ -3,9 +3,9 @@ package internal
 import (
 	"fmt"
 
-	luis "github.com/crazedpeanut/luis/client"
-	"github.com/crazedpeanut/luis/client/operations"
-	"github.com/crazedpeanut/luis/models"
+	luis "github.com/crazedpeanut/go-luis-authoring-client/client"
+	"github.com/crazedpeanut/go-luis-authoring-client/client/operations"
+	"github.com/crazedpeanut/go-luis-authoring-client/models"
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
@@ -18,10 +18,6 @@ func ResourceApplication() *schema.Resource {
 		Update: resourceApplicationUpdate,
 
 		Schema: map[string]*schema.Schema{
-			"id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
 			"name": {
 				Type:     schema.TypeString,
 				Required: true,
@@ -40,11 +36,13 @@ func ResourceApplication() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "",
+				ForceNew: true,
 			},
 			"domain": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "",
+				ForceNew: true,
 			},
 			"initial_version_id": {
 				Type:     schema.TypeString,
@@ -60,13 +58,13 @@ func resourceApplicationRead(d *schema.ResourceData, meta interface{}) error {
 
 	id := d.Id()
 
-	params := operations.GetApplicationParams{
-		AppID: id,
-	}
-	resp, err := client.Operations.GetApplication(&params, nil)
+	params := operations.NewGetApplicationParams()
+	params.SetAppID(id)
+
+	resp, err := client.Operations.GetApplication(params, nil)
 	if err != nil {
 		d.SetId("")
-		return nil
+		return fmt.Errorf("Error reading application %s %+v", id, err)
 	}
 
 	d.SetId(resp.Payload.ID)
@@ -79,20 +77,19 @@ func resourceApplicationCreate(d *schema.ResourceData, meta interface{}) error {
 
 	application := models.ApplicationCreateObject{
 		Name:             d.Get("name").(string),
-		Description:      d.Get("desciption").(string),
+		Description:      d.Get("description").(string),
 		Culture:          d.Get("culture").(string),
 		UsageScenario:    d.Get("usage_scenario").(string),
 		Domain:           d.Get("domain").(string),
+		InitialVersionID: d.Get("initial_version_id").(string),
 	}
 
-	params := operations.CreateApplicationParams{
-		ApplicationCreateObject: &application,
-	}
+	params := operations.NewCreateApplicationParams()
+	params.SetApplicationCreateObject(&application)
 
-	resp, err := client.Operations.CreateApplication(&params, nil)
+	resp, err := client.Operations.CreateApplication(params, nil)
 	if err != nil {
-		fmt.Errorf("Could not create application %s", err)
-		return nil
+		return fmt.Errorf("Error creating application %+v", err)
 	}
 
 	d.SetId(resp.Payload)
@@ -102,23 +99,20 @@ func resourceApplicationCreate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceApplicationUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*luis.LuisAuthoring)
+	id := d.Id()
 
 	application := models.ApplicationUpdateObject{
-		Name:             d.Get("name").(string),
-		Description:      d.Get("desciption").(string),
-		UsageScenario:    d.Get("usage_scenario").(string),
-		Domain:           d.Get("domain").(string),
+		Name:        d.Get("name").(string),
+		Description: d.Get("desciption").(string),
 	}
 
-	params := operations.UpdateApplicationParams{
-		ApplicationUpdateObject: &application,
-		AppID: d.Id()
-	}
+	params := operations.NewUpdateApplicationParams()
+	params.SetAppID(id)
+	params.SetApplicationUpdateObject(&application)
 
-	resp, err := client.Operations.UpdateApplication(&params, nil)
+	_, err := client.Operations.UpdateApplication(params, nil)
 	if err != nil {
-		fmt.Errorf("Could not update application %s", err)
-		return nil
+		return fmt.Errorf("Error updating application %s %+v", id, err)
 	}
 
 	return nil
@@ -128,15 +122,14 @@ func resourceApplicationDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*luis.LuisAuthoring)
 
 	id := d.Id()
-	params := operations.DeleteApplicationParams{
-		AppID: id,
-	}
+	params := operations.NewDeleteApplicationParams()
+	params.SetAppID(id)
 
 	d.SetId("")
 
-	_, err := client.Operations.DeleteApplication(&params, nil)
+	_, err := client.Operations.DeleteApplication(params, nil)
 	if err != nil {
-		fmt.Errorf("Could not delete application %s", err)
+		return fmt.Errorf("Error deleting application %s %+v", id, err)
 	}
 
 	return nil

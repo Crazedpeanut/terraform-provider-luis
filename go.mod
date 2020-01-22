@@ -1,7 +1,7 @@
 module github.com/crazedpeanut/terraform-provider-luis
 
 require (
-	github.com/crazedpeanut/luis v1.0.0
+	github.com/crazedpeanut/go-luis-authoring-client v0.0.4
 	github.com/go-openapi/runtime v0.19.9
 	github.com/go-openapi/spec v0.19.5
 	github.com/go-openapi/strfmt v0.19.4
@@ -13,7 +13,5 @@ require (
 	github.com/zclconf/go-cty v1.2.0
 	golang.org/x/tools v0.0.0-20200119215504-eb0d8dd85bcc // indirect
 )
-
-replace github.com/crazedpeanut/luis => /home/john/go/src/github.com/crazedpeanut/luis
 
 go 1.13

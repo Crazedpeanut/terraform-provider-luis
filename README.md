@@ -1,14 +1,8 @@
 # Terraform Provider
 
-- Website: https://www.terraform.io
-- [![Gitter chat](https://badges.gitter.im/hashicorp-terraform/Lobby.png)](https://gitter.im/hashicorp-terraform/Lobby)
-- Mailing list: [Google Groups](http://groups.google.com/group/terraform-tool)
-
-<img src="https://cdn.rawgit.com/hashicorp/terraform-website/master/content/source/assets/images/logo-hashicorp.svg" width="600px">
-
 ## Maintainers
 
-This provider plugin is maintained by the Terraform team at [HashiCorp](https://www.hashicorp.com/).
+This is an unoffical provider plugin, regular improvements or support will be attempted but no guarantees!    
 
 ## Requirements
 
@@ -19,7 +13,7 @@ This provider plugin is maintained by the Terraform team at [HashiCorp](https://
 
 ```
 # For example, restrict template version in 0.1.x
-provider "template" {
+provider "luis" {
   version = "~> 0.1"
 }
 ```
