@@ -36,7 +36,21 @@ $ make build
 
 ## Using the provider
 
-## Fill in for each provider
+```terraform
+resource "luis_application" "main" {
+  name    = "main"
+  culture = "en-us"
+}
+
+resource "luis_version" "main" {
+  app_id     = luis_application.main.id
+  version_id = "0.0.2"
+  content    = [This can be either LuDown or JSON representation of the luis version]
+  trained    = true
+  published  = true
+}
+
+```
 
 ## Developing the Provider
 
