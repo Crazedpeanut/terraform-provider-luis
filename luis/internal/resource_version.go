@@ -49,7 +49,7 @@ func ResourceVersion() *schema.Resource {
 }
 
 func resourceVersionRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*luis.LuisAuthoring)
+	client := meta.(*luis.Luis)
 
 	id := d.Id()
 	appID := d.Get("app_id").(string)
@@ -70,7 +70,7 @@ func resourceVersionRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceVersionCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*luis.LuisAuthoring)
+	client := meta.(*luis.Luis)
 
 	appID := d.Get("app_id").(string)
 	versionID := d.Get("version_id").(string)
@@ -107,12 +107,12 @@ func resourceVersionCreate(d *schema.ResourceData, meta interface{}) error {
 		if err != nil {
 			return fmt.Errorf("Could not train version %+v", err)
 		}
-	}
 
-	if published {
-		err := publishVersion(appID, versionID, client)
-		if err != nil {
-			return fmt.Errorf("Could not publish version %+v", err)
+		if published {
+			err := publishVersion(appID, versionID, client)
+			if err != nil {
+				return fmt.Errorf("Could not publish version %+v", err)
+			}
 		}
 	}
 
@@ -120,7 +120,7 @@ func resourceVersionCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceVersionDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*luis.LuisAuthoring)
+	client := meta.(*luis.Luis)
 
 	appID := d.Get("app_id").(string)
 	versionID := d.Get("version_id").(string)
@@ -151,7 +151,7 @@ func readJSONApp(raw *string) *models.JSONApp {
 	return &jsonApp
 }
 
-func publishVersion(appID string, versionID string, client *luis.LuisAuthoring) error {
+func publishVersion(appID string, versionID string, client *luis.Luis) error {
 	params := operations.NewPublishApplicationParams()
 	params.SetAppID(appID)
 
@@ -166,7 +166,7 @@ func publishVersion(appID string, versionID string, client *luis.LuisAuthoring) 
 	return err
 }
 
-func trainVersion(appID string, versionID string, client *luis.LuisAuthoring) error {
+func trainVersion(appID string, versionID string, client *luis.Luis) error {
 	err := beginTrain(appID, versionID, client)
 	if err != nil {
 		return fmt.Errorf("Unable to start train %+v", err)
@@ -186,7 +186,7 @@ func trainVersion(appID string, versionID string, client *luis.LuisAuthoring) er
 	}
 }
 
-func beginTrain(appID string, versionID string, client *luis.LuisAuthoring) error {
+func beginTrain(appID string, versionID string, client *luis.Luis) error {
 	params := operations.NewTrainVersionParams()
 	params.SetAppID(appID)
 	params.SetVersionID(versionID)
@@ -199,19 +199,24 @@ func beginTrain(appID string, versionID string, client *luis.LuisAuthoring) erro
 	return nil
 }
 
-func isTrainComplete(appID string, versionID string, client *luis.LuisAuthoring) (bool, error) {
-	params := operations.NewGetApplicationVersionParams()
+func isTrainComplete(appID string, versionID string, client *luis.Luis) (bool, error) {
+	params := operations.NewGetTrainingStatusParams()
 	params.SetAppID(appID)
 	params.SetVersionID(versionID)
 
-	resp, err := client.Operations.GetApplicationVersion(params, nil)
+	resp, err := client.Operations.GetTrainingStatus(params, nil)
 	if err != nil {
 		return false, err
 	}
+	for _, model := range resp.Payload {
+		if model.Status == "Fail" {
+			return false, fmt.Errorf("Error training version %s", model.FailureReason)
+		}
 
-	if resp.Payload.TrainingStatus == "Trained" {
-		return true, nil
+		if model.Status == "InProgress" {
+			return false, nil
+		}
 	}
 
-	return false, nil
+	return true, nil
 }

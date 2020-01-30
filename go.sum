@@ -70,6 +70,8 @@ github.com/crazedpeanut/go-luis-authoring-client v0.0.2 h1:PkDrMAoI4puwHsxEUULGP
 github.com/crazedpeanut/go-luis-authoring-client v0.0.2/go.mod h1:NQgyIcZT4MhnVSibbc7OOsn60blua8dbuEjhnKpaQtM=
 github.com/crazedpeanut/go-luis-authoring-client v0.0.4 h1:H51vFZ+Qui3XqKGDrEj2+bmxoYQBj4caSPEYXiunsCc=
 github.com/crazedpeanut/go-luis-authoring-client v0.0.4/go.mod h1:NQgyIcZT4MhnVSibbc7OOsn60blua8dbuEjhnKpaQtM=
+github.com/crazedpeanut/go-luis-authoring-client v0.0.7 h1:Zu4EKA/lxIf4/vucQpN8ZkTDdfOPX3DWoPNTSEpQ2lI=
+github.com/crazedpeanut/go-luis-authoring-client v0.0.7/go.mod h1:NQgyIcZT4MhnVSibbc7OOsn60blua8dbuEjhnKpaQtM=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=

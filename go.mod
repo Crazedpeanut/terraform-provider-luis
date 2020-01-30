@@ -1,7 +1,7 @@
 module github.com/crazedpeanut/terraform-provider-luis
 
 require (
-	github.com/crazedpeanut/go-luis-authoring-client v0.0.4
+	github.com/crazedpeanut/go-luis-authoring-client v0.0.7
 	github.com/go-openapi/runtime v0.19.9
 	github.com/go-openapi/spec v0.19.5
 	github.com/go-openapi/strfmt v0.19.4

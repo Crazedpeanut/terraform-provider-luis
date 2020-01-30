@@ -14,7 +14,7 @@ type ClientOptions struct {
 }
 
 // NewClient produces a client to call LUIS Authoring API
-func NewClient(o *ClientOptions) *luis.LuisAuthoring {
+func NewClient(o *ClientOptions) *luis.Luis {
 
 	transport := client.New(o.Domain, "/luis/api/v2.0", nil)
 	transport.DefaultAuthentication = client.APIKeyAuth("Ocp-Apim-Subscription-Key", "header", o.Key)

@@ -55,7 +55,7 @@ func ResourceApplication() *schema.Resource {
 }
 
 func resourceApplicationRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*luis.LuisAuthoring)
+	client := meta.(*luis.Luis)
 
 	id := d.Id()
 
@@ -74,7 +74,7 @@ func resourceApplicationRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceApplicationCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*luis.LuisAuthoring)
+	client := meta.(*luis.Luis)
 
 	application := models.ApplicationCreateObject{
 		Name:             d.Get("name").(string),
@@ -99,7 +99,7 @@ func resourceApplicationCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceApplicationUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*luis.LuisAuthoring)
+	client := meta.(*luis.Luis)
 	id := d.Id()
 
 	application := models.ApplicationUpdateObject{
@@ -120,7 +120,7 @@ func resourceApplicationUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceApplicationDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*luis.LuisAuthoring)
+	client := meta.(*luis.Luis)
 
 	id := d.Id()
 	params := operations.NewDeleteApplicationParams()
