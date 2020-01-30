@@ -9,6 +9,7 @@ import (
 	"github.com/crazedpeanut/go-luis-authoring-client/client/operations"
 	"github.com/crazedpeanut/go-luis-authoring-client/models"
 	"github.com/hashicorp/terraform/helper/schema"
+	"log"
 )
 
 // ResourceVersion managed luis application resources
@@ -167,6 +168,8 @@ func publishVersion(appID string, versionID string, client *luis.Luis) error {
 }
 
 func trainVersion(appID string, versionID string, client *luis.Luis) error {
+	log.Printf("[DEBUG] Begin training app: %s version: %s", appID, versionID)
+
 	err := beginTrain(appID, versionID, client)
 	if err != nil {
 		return fmt.Errorf("Unable to start train %+v", err)
@@ -179,8 +182,11 @@ func trainVersion(appID string, versionID string, client *luis.Luis) error {
 		}
 
 		if complete {
+			log.Printf("[DEBUG] training app: %s version: %s complete", appID, versionID)
 			return nil
 		}
+
+		log.Printf("[DEBUG] training app: %s version: %s still going", appID, versionID)
 
 		time.Sleep(10 * time.Second)
 	}
@@ -209,12 +215,16 @@ func isTrainComplete(appID string, versionID string, client *luis.Luis) (bool, e
 		return false, err
 	}
 
+	log.Printf("[DEBUG] number of models training: %d", len(resp.Payload))
+
 	for _, model := range resp.Payload {
-		if model.Status == "Fail" {
-			return false, fmt.Errorf("Error training version %s", model.FailureReason)
+		log.Printf("[DEBUG] Model status: %s", model.Details.Status)
+
+		if model.Details.Status == "Fail" {
+			return false, fmt.Errorf("Error training version %s", model.Details.FailureReason)
 		}
 
-		if model.Status == "InProgress" {
+		if model.Details.Status == "InProgress" {
 			return false, nil
 		}
 	}
