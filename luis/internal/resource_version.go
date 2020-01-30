@@ -208,6 +208,7 @@ func isTrainComplete(appID string, versionID string, client *luis.Luis) (bool, e
 	if err != nil {
 		return false, err
 	}
+
 	for _, model := range resp.Payload {
 		if model.Status == "Fail" {
 			return false, fmt.Errorf("Error training version %s", model.FailureReason)
