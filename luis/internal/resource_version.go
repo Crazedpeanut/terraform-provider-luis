@@ -224,7 +224,7 @@ func isTrainComplete(appID string, versionID string, client *luis.Luis) (bool, e
 			return false, fmt.Errorf("Error training version %s", model.Details.FailureReason)
 		}
 
-		if model.Details.Status == "InProgress" {
+		if model.Details.Status == "InProgress" || model.Details.Status == "Queued" {
 			return false, nil
 		}
 	}
