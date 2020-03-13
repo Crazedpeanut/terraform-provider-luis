@@ -80,23 +80,21 @@ func resourceVersionCreate(d *schema.ResourceData, meta interface{}) error {
 	trained := d.Get("trained").(bool)
 	published := d.Get("published").(bool)
 
-	if isJSON(&content) {
+	if version, err := parseVersion(&content); err == nil {
 		params := operations.NewImportVersionJSONParams()
 		params.SetAppID(appID)
 		params.SetVersionID(&versionID)
-		params.SetContent(content)
-
-		log.Printf("[DEBUG] Import version %s\n", content)
+		params.SetJSONApp(&version)
 
 		_, err := client.Operations.ImportVersionJSON(params, nil)
 		if err != nil {
-
 			if err, badRequest := err.(*operations.ImportVersionJSONBadRequest); badRequest {
-				return fmt.Errorf("Could not create version bad request (JSON)  %+v", err.GetPayload().Error)
+				return fmt.Errorf("Could not create version bad request (JSON) %+v", err.GetPayload().Error)
 			}
 			return fmt.Errorf("Could not create version (JSON) %+v", err)
 		}
 	} else {
+		log.Printf("[DEBUG] Not JSON %+v", err)
 		params := operations.NewImportVersionLuParams()
 		params.SetAppID(appID)
 		params.SetVersionID(&versionID)
@@ -147,10 +145,12 @@ func resourceVersionDelete(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func isJSON(s *string) bool {
-	var js map[string]interface{}
-	return json.Unmarshal([]byte(*s), &js) == nil
+func parseVersion(s *string) (models.JSONApp, error) {
+	var js models.JSONApp
 
+	err := json.Unmarshal([]byte(*s), &js)
+
+	return js, err
 }
 
 func readJSONApp(raw *string) *models.JSONApp {
