@@ -4,6 +4,8 @@
 
 This is an unoffical provider plugin, regular improvements or support will be attempted but no guarantees!    
 
+Please let Microsoft know there is demand for a Luis Terraform Provider by voting for this idea on UserVoice https://cognitive.uservoice.com/forums/551524-language-understanding-luis/suggestions/39795295-terraform-provider-for-authoring
+
 ## Requirements
 
 - [Terraform](https://www.terraform.io/downloads.html) 0.10.x
