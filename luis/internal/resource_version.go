@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"time"
 
+	"log"
+
 	luis "github.com/crazedpeanut/go-luis-authoring-client/client"
 	"github.com/crazedpeanut/go-luis-authoring-client/client/operations"
 	"github.com/crazedpeanut/go-luis-authoring-client/models"
 	"github.com/hashicorp/terraform/helper/schema"
-	"log"
 )
 
 // ResourceVersion managed luis application resources
@@ -85,9 +86,15 @@ func resourceVersionCreate(d *schema.ResourceData, meta interface{}) error {
 		params.SetVersionID(&versionID)
 		params.SetContent(content)
 
+		log.Printf("[DEBUG] Import version %s\n", content)
+
 		_, err := client.Operations.ImportVersionJSON(params, nil)
 		if err != nil {
-			return fmt.Errorf("Could not create version %+v", err)
+
+			if err, badRequest := err.(*operations.ImportVersionJSONBadRequest); badRequest {
+				return fmt.Errorf("Could not create version bad request (JSON)  %+v", err.GetPayload().Error)
+			}
+			return fmt.Errorf("Could not create version (JSON) %+v", err)
 		}
 	} else {
 		params := operations.NewImportVersionLuParams()
@@ -97,7 +104,7 @@ func resourceVersionCreate(d *schema.ResourceData, meta interface{}) error {
 
 		_, err := client.Operations.ImportVersionLu(params, nil)
 		if err != nil {
-			return fmt.Errorf("Could not create version %+v", err)
+			return fmt.Errorf("Could not create version (LuDown) %+v", err)
 		}
 	}
 
