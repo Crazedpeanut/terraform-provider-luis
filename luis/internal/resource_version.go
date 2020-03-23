@@ -46,6 +46,18 @@ func ResourceVersion() *schema.Resource {
 				Optional: true,
 				ForceNew: true,
 			},
+			"publish_version_direct": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+				ForceNew: true,
+			},
+			"is_staging": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+				ForceNew: true,
+			},
 		},
 	}
 }
@@ -77,8 +89,10 @@ func resourceVersionCreate(d *schema.ResourceData, meta interface{}) error {
 	appID := d.Get("app_id").(string)
 	versionID := d.Get("version_id").(string)
 	content := d.Get("content").(string)
+	isStaging := d.Get("is_staging").(bool)
 	trained := d.Get("trained").(bool)
 	published := d.Get("published").(bool)
+	directPublish := d.Get("publish_version_direct").(bool)
 
 	if version, err := parseVersion(&content); err == nil {
 		params := operations.NewImportVersionJSONParams()
@@ -115,7 +129,7 @@ func resourceVersionCreate(d *schema.ResourceData, meta interface{}) error {
 		}
 
 		if published {
-			err := publishVersion(appID, versionID, client)
+			err := publishVersion(appID, versionID, isStaging, directPublish, client)
 			if err != nil {
 				return fmt.Errorf("Could not publish version %+v", err)
 			}
@@ -159,13 +173,14 @@ func readJSONApp(raw *string) *models.JSONApp {
 	return &jsonApp
 }
 
-func publishVersion(appID string, versionID string, client *luis.Luis) error {
+func publishVersion(appID string, versionID string, isStaging bool, directPublish bool, client *luis.Luis) error {
 	params := operations.NewPublishApplicationParams()
 	params.SetAppID(appID)
 
 	publishObject := models.ApplicationPublishObject{
 		VersionID:            versionID,
-		DirectVersionPublish: true,
+		DirectVersionPublish: directPublish,
+		IsStaging:            &isStaging,
 	}
 	params.SetApplicationPublishObject(&publishObject)
 
